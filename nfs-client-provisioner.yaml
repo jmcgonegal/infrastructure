@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nfs-client-provisioner
+  name: nfs-client-provisioner
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-client-provisioner
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nfs-client-provisioner
+    spec:
+      containers:
+        - name: nfs-client-provisioner
+          image: quay.io/external_storage/nfs-client-provisioner-arm:v3.1.0-k8s1.11
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: nfs-secrets
+          env:
+            - name: PROVISIONER_NAME
+              value: cluster.local/nfs-client-provisioner
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /persistentvolumes
+              name: nfs-client-root
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: nfs-client-provisioner
+      serviceAccountName: nfs-client-provisioner
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            path: "/$(NFS_PATH)"
+            server: $(NFS_SERVER)
