@@ -38,11 +38,9 @@ spec:
       - name: postgres
         image: postgres:alpine
         imagePullPolicy: IfNotPresent
-        env:
-        - name: PGDATA
-          value: "/var/lib/postgresql/data/pgdata"
-        - name: POSTGRES_PASSWORD
-          value: postgres
+        envFrom:
+          - secretRef:
+              name: psql-secrets
         volumeMounts:
         - mountPath: "/var/lib/postgresql/data"
           name: sql-storage

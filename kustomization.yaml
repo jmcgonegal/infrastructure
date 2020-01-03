@@ -30,6 +30,8 @@ secretGenerator:
     env: .env-mysql
   - name: rabbitmq-secrets
     env: .env-rabbitmq
+  - name: psql-secrets
+    env: .env-psql
 configurations:
   # maps what fields can have variable substitution used below
   - config.yaml
