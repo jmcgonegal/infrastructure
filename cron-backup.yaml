@@ -1,0 +1,40 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-wordpress-backup
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: wordpress-backup
+              image: jmcgonegal/alpine-mariadb-client
+              envFrom:
+                - secretRef:
+                    name: wordpress-secrets
+              args:
+                - /bin/sh
+                - -c
+                - mysqldump --host=$WORDPRESS_DB_HOST --port=$WORDPRESS_DB_PORT --user=$WORDPRESS_DB_USER --password=$WORDPRESS_DB_PASS $WORDPRESS_DB_NAME | gzip > /mnt/backup-wordpress-`date +%m-%d-%Y`.sql.gz
+              volumeMounts:
+                - name: wordpress-backup
+                  mountPath: "/mnt"
+            - name: cleanup-backups
+              image: alpine
+              args:
+                - /bin/sh
+                - -c
+                # remove files older than 7 days
+                - find /mnt -type f -mtime +7 -name '*.sql.gz' -delete
+              volumeMounts:
+                - name: wordpress-backup
+                  mountPath: "/mnt"
+          restartPolicy: OnFailure
+          volumes:
+            - name: wordpress-backup
+              nfs:
+                server: $(NFS_SERVER)
+                # folder must exist
+                path: $(NFS_PATH)
