@@ -6,7 +6,7 @@ resources:
   - iscsi-mariadb.yaml
 secretGenerator:
   - name: generated-secrets
-    env: .env-secret
+    env: ../.env-secret
 configurations:
   # maps what fields can have variable substitution used below
   - ../config.yaml
