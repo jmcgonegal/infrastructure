@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-deployment
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+          image: rabbitmq:3-management
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+            - containerPort: 25672
+          envFrom:
+            - secretRef:
+                name: rabbitmq-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  type: NodePort
+  ports:
+    # rmq
+    - port: 5672
+      name: rmq
+      protocol: TCP
+      nodePort: 31670
+    # admin
+    - port: 15672
+      name: admin
+      protocol: TCP
+      nodePort: 31671
+    # clustering
+    #- port: 25672
+    #  name cluster
+    #  protocol: TCP
+    #  nodePort: 25673
+  selector:
+    app: rabbitmq

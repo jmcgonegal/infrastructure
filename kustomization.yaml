@@ -7,6 +7,7 @@ resources:
   - postgresql.yaml
   - redis.yaml
   - mariadb.yaml
+  - rabbitmq.yaml
   # wordpress
   - wordpress.yaml
   # backups
@@ -29,6 +30,8 @@ secretGenerator:
     env: .env-sites
   - name: mysql-secrets
     env: .env-mysql
+  - name: rabbitmq-secrets
+    env: .env-rabbitmq
 configurations:
   # maps what fields can have variable substitution used below
   - config.yaml
