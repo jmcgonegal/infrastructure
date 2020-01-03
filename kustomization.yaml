@@ -11,21 +11,21 @@ resources:
   # backups
   - cron-backup.yaml
 configMapGenerator:
+  - name: nfs-config
+    env: .env-nfs
   - name: nginx-config
     files:
       - configs/nginx.conf
   - name: redis-config
     files:
       - configs/redis.conf
+  - name: site-config
+    env: .env-sites
 secretGenerator:
   - name: generated-secrets
     env: .env-secret
   - name: wordpress-secrets
     env: .env-wordpress
-  - name: nfs-secrets
-    env: .env-nfs
-  - name: site-secrets
-    env: .env-sites
   - name: mysql-secrets
     env: .env-mysql
   - name: rabbitmq-secrets
@@ -38,32 +38,44 @@ vars:
   # nfs
   - name: NFS_SERVER
     objref:
-      name: nfs-secrets
+      name: nfs-config
       apiVersion: v1
-      kind: Secret
+      kind: ConfigMap
+    fieldref:
+      fieldpath: data.NFS_SERVER
   - name: NFS_PATH
     objref:
-      name: nfs-secrets
+      name: nfs-config
       apiVersion: v1
-      kind: Secret
+      kind: ConfigMap
+    fieldref:
+      fieldpath: data.NFS_PATH
   # sites
   - name: DOMAIN_LOCAL
     objref:
-      name: site-secrets
-      kind: Secret
+      name: site-config
+      kind: ConfigMap
       apiVersion: v1
+    fieldref:
+      fieldpath: data.DOMAIN_LOCAL
   - name: DOMAIN_1
     objref:
-      name: site-secrets
-      kind: Secret
+      name: site-config
+      kind: ConfigMap
       apiVersion: v1
+    fieldref:
+      fieldpath: data.DOMAIN_1_JOHN
   - name: DOMAIN_2_WWW
     objref:
-      name: site-secrets
-      kind: Secret
+      name: site-config
+      kind: ConfigMap
       apiVersion: v1
+    fieldref:
+      fieldpath: data.DOMAIN_2_WWW
   - name: DOMAIN_2
     objref:
-      name: site-secrets
-      kind: Secret
+      name: site-config
+      kind: ConfigMap
       apiVersion: v1
+    fieldref:
+      fieldpath: data.DOMAIN_2
