@@ -24,8 +24,6 @@ configMapGenerator:
   - name: site-config
     env: .env-sites
 secretGenerator:
-  - name: generated-secrets
-    env: .env-secret
   - name: wordpress-secrets
     env: .env-wordpress
   - name: mysql-secrets

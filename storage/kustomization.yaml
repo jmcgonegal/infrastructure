@@ -4,27 +4,30 @@ resources:
   # infrastructure
   - iscsi-postgres.yaml
   - iscsi-mariadb.yaml
-secretGenerator:
-  - name: generated-secrets
-    env: ../.env-secret
-configurations:
-  # maps what fields can have variable substitution used below
-  - ../config.yaml
+configMapGenerator:
+  - name: iscsi-config
+    env: ../.env-iscsi
 vars:
   # this should all exist in ENV files specified `key=value`
   # iscsi
   - name: ISCSI_HOST
     objref:
-      name: generated-secrets
+      name: iscsi-config
       apiVersion: v1
-      kind: Secret
+      kind: ConfigMap
+    fieldref:
+      fieldpath: data.ISCSI_HOST
   - name: ISCSI_SQL_IQN
     objref:
-      name: generated-secrets
+      name: iscsi-config
       apiVersion: v1
-      kind: Secret
+      kind: ConfigMap
+    fieldref:
+      fieldpath: data.ISCSI_SQL_IQN
   - name: ISCSI_PSQL_IQN
     objref:
-      name: generated-secrets
+      name: iscsi-config
       apiVersion: v1
-      kind: Secret
+      kind: ConfigMap
+    fieldref:
+      fieldpath: data.ISCSI_PSQL_IQN
