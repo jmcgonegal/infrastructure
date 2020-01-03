@@ -37,4 +37,4 @@ spec:
               nfs:
                 server: $(NFS_SERVER)
                 # folder must exist
-                path: $(NFS_PATH)
+                path: "/$(NFS_PATH)"
