@@ -1,0 +1,18 @@
+varReference:
+  # iscsi-mariadb.yaml and iscsi-postgres.yaml
+  - path: spec/iscsi/targetPortal
+    kind: PersistentVolume
+  - path: spec/iscsi/iqn
+    kind: PersistentVolume
+  # nfs-client-provisioner.yaml and wordpress.yaml
+  - path: spec/template/spec/volumes[]/nfs/server
+    kind: Deployment
+  - path: spec/template/spec/volumes[]/nfs/path
+    kind: Deployment
+  # wordpress.yaml
+  - path: spec/rules[]/host
+    kind: Ingress
+  - path: spec/jobTemplate/spec/template/spec/volumes/nfs/server
+    kind: CronJob
+  - path: spec/jobTemplate/spec/template/spec/volumes/nfs/path
+    kind: CronJob

@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pv-claim
+spec:
+  volumeName: "iscsi-pv-mariadb"
+  storageClassName: "manual"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+data:
+  ignore.cnf: |
+    # ignore lost-found directory on mounted device
+    ignore-db-dir=lost+found
+kind: ConfigMap
+metadata:
+  name: mariadb-ignore
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      restartPolicy: Always
+      #initContainers:
+      #- name: postgres-init
+      #  image: yobasystems/alpine-mariadb:latest
+      #  command: ['sh', '-c', 'ln -s /etc/config/ignore.cnf /etc/my.cnf.d/ignore.cnf']
+      containers:
+        - name: postgres
+          image: yobasystems/alpine-mariadb:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: mysql-secrets
+          #env:
+          #- name: MYSQL_RANDOM_ROOT_PASSWORD
+          #  value: true
+          volumeMounts:
+            - mountPath: "/var/lib/mysql"
+              name: mysql-storage
+            #- mountPath: "/etc/config"
+            #  name: mysql-config
+            #  readOnly: true
+            - mountPath: "/etc/my.cnf.d/ignore.cnf"
+              name: mysql-config
+              # SubPaths are not automatically updated when a ConfigMap is modified.
+              subPath: ignore.cnf
+              readOnly: true
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pv-claim
+        - name: mysql-config
+          configMap:
+            name: mariadb-ignore
+---
+# this exposes the containers 5432 port to the network on 32432 on each node in the deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mariadb
+spec:
+  type: NodePort
+  ports:
+    - port: 3306
+      nodePort: 30306
+      targetPort: 3306
+      name: mysql
+  selector:
+    app: mariadb

@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-claim
+spec:
+  volumeName: "iscsi-postgres"
+  storageClassName: "manual"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  strategy:
+    type: Recreate	
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      restartPolicy: Always
+      initContainers:
+      # only start if the filesystem is accessible
+      - name: init-postgres
+        image: postgres:alpine
+        command: ['sh', '-c', 'mkdir -p /var/lib/postgresql/data/pgdata']
+      containers:
+      - name: postgres
+        image: postgres:alpine
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+        - name: POSTGRES_PASSWORD
+          value: postgres
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: sql-storage
+        ports: 
+          - containerPort: 5432
+            protocol: TCP
+      volumes:
+      - name: sql-storage
+        persistentVolumeClaim:
+          claimName: postgres-claim
+---
+# this exposes the containers 5432 port to the network on 32432 on each node in the deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      nodePort: 32432
+      name: psql
+  selector:
+    app: postgres

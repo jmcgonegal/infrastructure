@@ -1,0 +1,84 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # infrastructure
+  - iscsi-postgres.yaml
+  - iscsi-mariadb.yaml
+  - postgresql.yaml
+  - redis.yaml
+  - mariadb.yaml
+  # wordpress
+  - wordpress.yaml
+  # backups
+  - cron-backup.yaml
+configMapGenerator:
+  - name: nginx-config
+    files:
+      - configs/nginx.conf
+  - name: redis-config
+    files:
+      - configs/redis.conf
+secretGenerator:
+  - name: generated-secrets
+    env: .env-secret
+  - name: wordpress-secrets
+    env: .env-wordpress
+  - name: nfs-secrets
+    env: .env-nfs
+  - name: site-secrets
+    env: .env-sites
+  - name: mysql-secrets
+    env: .env-mysql
+configurations:
+  # maps what fields can have variable substitution used below
+  - config.yaml
+vars:
+  # this should all exist in ENV files specified `key=value`
+  # iscsi
+  - name: ISCSI_HOST
+    objref:
+      name: generated-secrets
+      apiVersion: v1
+      kind: Secret
+  - name: ISCSI_SQL_IQN
+    objref:
+      name: generated-secrets
+      apiVersion: v1
+      kind: Secret
+  - name: ISCSI_PSQL_IQN
+    objref:
+      name: generated-secrets
+      apiVersion: v1
+      kind: Secret
+  # nfs
+  - name: NFS_SERVER
+    objref:
+      name: nfs-secrets
+      apiVersion: v1
+      kind: Secret
+  - name: NFS_PATH
+    objref:
+      name: nfs-secrets
+      apiVersion: v1
+      kind: Secret
+  # sites
+  - name: DOMAIN_LOCAL
+    objref:
+      name: site-secrets
+      kind: Secret
+      apiVersion: v1
+  - name: DOMAIN_1
+    objref:
+      name: site-secrets
+      kind: Secret
+      apiVersion: v1
+  - name: DOMAIN_2_WWW
+    objref:
+      name: site-secrets
+      kind: Secret
+      apiVersion: v1
+  - name: DOMAIN_2
+    objref:
+      name: site-secrets
+      kind: Secret
+      apiVersion: v1

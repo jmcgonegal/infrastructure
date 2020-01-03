@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: redis
+          image: redis:alpine
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: "/usr/local/etc/redis/redis.conf"
+              name: redis-vol-config
+              # SubPaths are not automatically updated when a ConfigMap is modified.
+              subPath: redis.conf
+              readOnly: true
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+      volumes:
+        - name: redis-vol-config
+          configMap:
+            name: redis-config
