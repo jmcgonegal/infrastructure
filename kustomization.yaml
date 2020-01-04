@@ -35,6 +35,10 @@ secretGenerator:
 configurations:
   # maps what fields can have variable substitution used below
   - config.yaml
+patchesStrategicMerge:
+  # these files are built by ./build.sh
+  - build/wordpress.yaml
+  - build/nfs-client-provisioner.yaml
 vars:
   # this should all exist in ENV files specified `key=value`
   # nfs

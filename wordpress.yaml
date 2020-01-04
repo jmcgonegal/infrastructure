@@ -43,9 +43,9 @@ spec:
       volumes:
         - name: wordpress-storage
           nfs:
-            server: $(NFS_SERVER)
-            # folder must exist
-            path: "/$(NFS_PATH)"
+            # this is replaced on build by pre/wordpress.yaml
+            server: ""
+            path: "/"
         - name: redis-config
           configMap:
             name: wordpress-redis-config

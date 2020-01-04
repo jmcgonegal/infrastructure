@@ -4,11 +4,6 @@ varReference:
     kind: PersistentVolume
   - path: spec/iscsi/iqn
     kind: PersistentVolume
-  # nfs-client-provisioner.yaml and wordpress.yaml
-  - path: spec/template/spec/volumes[]/nfs/server
-    kind: Deployment
-  - path: spec/template/spec/volumes[]/nfs/path
-    kind: Deployment
   # wordpress.yaml
   - path: spec/rules[]/host
     kind: Ingress

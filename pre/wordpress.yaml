@@ -1,0 +1,14 @@
+# this file is edited and copied to deploy/ at build time to add environment variables
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+spec:
+  template:
+    spec:
+      volumes:
+        - name: wordpress-storage
+          nfs:
+            server: $NFS_SERVER
+            path: "/$NFS_PATH"
+
