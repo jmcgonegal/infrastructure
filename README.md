@@ -5,11 +5,16 @@ This is a kubernetes kustomize configuration for my home lab. The repository is 
 ```
 kubectl apply -k . --dry-run -o yaml
 ```
+# Testing build/ outputs
+
+```
+./build.sh
+```
 
 # Deploy
 
 ```
-kubectl apply -k .
+./deploy.sh
 ```
 
 # Requirements
