@@ -15,9 +15,6 @@ resources:
 configMapGenerator:
   - name: nfs-config
     env: .env-nfs
-  - name: nginx-config
-    files:
-      - configs/nginx.conf
   - name: redis-config
     files:
       - configs/redis.conf
