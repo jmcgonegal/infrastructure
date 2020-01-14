@@ -82,3 +82,10 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.DOMAIN_2
+  - name: DOMAIN_3
+    objref:
+      name: site-config
+      kind: ConfigMap
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.DOMAIN_3
