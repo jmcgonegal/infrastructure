@@ -10,5 +10,5 @@ spec:
         - name: wordpress-storage
           nfs:
             server: $NFS_SERVER
-            path: "/$NFS_PATH"
+            path: "/$NFS_PATH/wordpress"
 

@@ -15,9 +15,6 @@ resources:
 configMapGenerator:
   - name: nfs-config
     env: .env-nfs
-  - name: nginx-config
-    files:
-      - configs/nginx.conf
   - name: redis-config
     files:
       - configs/redis.conf
@@ -85,3 +82,10 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.DOMAIN_2
+  - name: DOMAIN_3
+    objref:
+      name: site-config
+      kind: ConfigMap
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.DOMAIN_3

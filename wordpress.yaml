@@ -100,3 +100,10 @@ spec:
             backend:
               serviceName: wordpress-service
               servicePort: 80
+    - host: $(DOMAIN_3)
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: wordpress-service
+              servicePort: 80
